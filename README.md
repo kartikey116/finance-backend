@@ -70,7 +70,6 @@ Use these pre-configured accounts to explore the system's Role-Based Access Cont
 
 ---
 
-<<<<<<< HEAD
 ## Strategic Technical Decisions & Architectural Rationale
 
 The **Finance Backend** was designed with a "Security-First, Scale-Always" philosophy. Every technical decision was evaluated against three main criteria: **Data Integrity**, **System Resilience**, and **Developer Experience**.
@@ -105,9 +104,6 @@ The **Finance Backend** was designed with a "Security-First, Scale-Always" philo
 *   **Rationale**: Financial apps cannot tolerate "junk data." Zod ensures that amounts are always positive numbers and categories match our strict enums before any business logic is executed. A centralized error middleware handles these failures with standardized JSON responses.
 
 ---
-
-=======
->>>>>>> 1aa2d41e169e192f76832da16a61183c3aeb6994
 ## API Documentation & Route Examples
 
 ### 1. Authentication (`/api/auth`)
@@ -190,6 +186,22 @@ The **Finance Backend** was designed with a "Security-First, Scale-Always" philo
 - **GET `/api/health`**
   - **Description**: Real-time status of Database, Redis, and Uptime.
 
+---
+
+## Testing Suite: Reliability at the Core
+
+Quality assurance is an integral part of our development lifecycle. The **Finance Backend** includes a comprehensive suite of automated tests to ensure functional correctness and prevent regressions.
+
+- **Framework**: We use **Jest** as our core test runner and **Supertest** for high-fidelity API integration testing.
+- **Scope**:
+    *   **Authentication Tests**: Verifying JWT issuance, refresh token rotation, and cookie-based security.
+    *   **Finance Logic Tests**: Validating ownership-based filtering (RBAC) and data isolation.
+    *   **Dashboard Tests**: Ensuring aggregate calculations are mathematically accurate under different role scopes.
+
+```bash
+# To run the full test suite
+npm run test
+```
 ---
 
 ## Future-Proofing / Roadmap

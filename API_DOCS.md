@@ -1,7 +1,5 @@
 # Finance API Documentation
 
-Welcome to the Finance Dashboard API! This documentation serves as a quick-start guide to the endpoints available.
-
 ## Authentication
 This API uses **JSON Web Tokens (JWT)** for authentication.
 Include the token in the `Authorization` header of all protected requests:

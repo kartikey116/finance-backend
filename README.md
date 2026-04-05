@@ -10,7 +10,7 @@
 
 ---
 
-## 🌐 Live Deployment
+## Live Deployment
 
 | Service | URL |
 | :--- | :--- |
@@ -20,7 +20,7 @@
 
 ---
 
-## 💎 The Engineering Vision
+## The Engineering Vision
 
 Modern financial platforms demand more than just "CRUD." They require absolute data integrity, ironclad role-based security, and lightning-fast analytics. The **Finance Backend** was architected to solve three core engineering challenges:
 
@@ -30,7 +30,7 @@ Modern financial platforms demand more than just "CRUD." They require absolute d
 
 ---
 
-## 🔐 Demo Credentials
+## Demo Credentials
 
 Use these pre-configured accounts to explore the system's Role-Based Access Control (RBAC).
 
@@ -42,21 +42,21 @@ Use these pre-configured accounts to explore the system's Role-Based Access Cont
 
 ---
 
-## ⚡ Core Features
+## Core Features
 
-### 🛡️ Ironclad Authentication & Session Control
+### Ironclad Authentication & Session Control
 - **Dual-Token Rotation**: A secure JWT Access/Refresh rotation system that keeps users logged in safely while allowing instant session revocation.
 - **Redis-Backed Sessions**: We use Redis (via Upstash) to manage active sessions and provide a "Kill Switch" for any account in real-time.
 - **HttpOnly Secure Cookies**: Refresh tokens are stored in non-accessible cookies, mitigating XSS and CSRF risks at the browser level.
 
-### 📊 Atomic Financial Ledger
+### Atomic Financial Ledger
 - **Soft-Delete Architecture**: Records are never destroyed. An `isDeleted` flag preserves audit integrity, supporting professional accounting standards.
 - **Multi-Factor Filtering**: Slice and dice data by category, type (Income/Expense), date ranges, or global search.
 - **Offset Pagination**: Optimized list views that never load more data than the network can handle.
 
 ---
 
-## 🏗️ Permission Matrix (RBAC)
+## Permission Matrix (RBAC)
 
 | Capability | Viewer | Analyst | Admin |
 | :--- | :---: | :---: | :---: |
@@ -70,7 +70,7 @@ Use these pre-configured accounts to explore the system's Role-Based Access Cont
 
 ---
 
-## 📖 API Documentation & Route Examples
+## API Documentation & Route Examples
 
 ### 1. Authentication (`/api/auth`)
 
@@ -166,7 +166,7 @@ This project is built to scale beyond a simple dashboard. Our next phase focused
 
 ---
 
-## 🚀 Rapid Deployment
+## Rapid Deployment
 
 ### 1. Setup
 ```bash
@@ -179,6 +179,6 @@ The server starts at `http://localhost:5000`. Access the interactive **Swagger U
 
 ---
 
-## 👨‍💻 Engineering Leadership
+## Engineering Leadership
 
 This project serves as a showcase of **Clean Architecture**, **Layered Security**, and **Real-World Optimization**. It is ready for deployment and architectural scrutiny.

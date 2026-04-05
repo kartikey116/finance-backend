@@ -13,7 +13,6 @@ import healthRoutes from "./modules/health/health.routes.js";
 import { setupSwagger } from "./config/swagger.js";
 
 const app = express();
-
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
@@ -21,6 +20,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 setupSwagger(app);
+
 app.use(rateLimiter);
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);

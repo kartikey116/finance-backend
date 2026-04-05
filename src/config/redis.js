@@ -5,15 +5,12 @@ import { env } from "./env.js";
 let redisClient = null;
 
 if (env.REDIS_URL) {
-  // Use standard Redis URL if provided
   redisClient = new Redis(env.REDIS_URL);
 } else if (env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN) {
   const upstashClient = new UpstashRedis({
     url: env.UPSTASH_REDIS_REST_URL,
     token: env.UPSTASH_REDIS_REST_TOKEN,
   });
-
-  // Proxy-based compatibility layer: Correctly routes ioredis set commands to Upstash
   redisClient = new Proxy(upstashClient, {
     get: (target, prop) => {
       const originalValue = target[prop];

@@ -18,8 +18,6 @@ export const listRecords = async (query, user) => {
   const limitNum = parseInt(limit);
 
   const filter = {};
-  
-  // Role-based filtering: Viewers only see their own records
   if (user.role === "Viewer") {
     filter.createdBy = user.id;
   }
@@ -68,8 +66,6 @@ export const getRecordById = async (id, user) => {
   if (!record) {
     throw new ApiError(404, "Financial record not found");
   }
-
-  // Ownership check for Viewers
   if (user.role === "Viewer" && record.createdBy._id.toString() !== user.id) {
     throw new ApiError(403, "You do not have permission to view this record");
   }
@@ -83,8 +79,6 @@ export const updateRecord = async (id, updateData, user) => {
   if (!record) {
     throw new ApiError(404, "Financial record not found");
   }
-
-  // Extra safety: only Admins can reach this from routes, but good for service integrity
   if (user.role !== "Admin") {
      throw new ApiError(403, "Only Admins can update records");
   }

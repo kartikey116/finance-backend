@@ -28,8 +28,6 @@ export const updateUserStatus = async (userId, isActive) => {
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
-  // If user is deactivated, force logout by removing redis session
   if (!isActive && redisClient) {
     await redisClient.del(`session:${userId}`);
   }

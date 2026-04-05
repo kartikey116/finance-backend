@@ -2,8 +2,6 @@ import { z } from "zod";
 import dotenv from "dotenv";
 
 dotenv.config();
-
-// Account for existing .env variables from previous setups
 if (!process.env.JWT_SECRET && process.env.JWT_ACCESS_SECRET) {
   process.env.JWT_SECRET = process.env.JWT_ACCESS_SECRET;
 }

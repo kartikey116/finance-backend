@@ -11,7 +11,6 @@ describe("Auth API Endpoints", () => {
   });
 
   afterAll(async () => {
-    // Cleanup mock data
     await User.deleteMany({ email: "testunit@example.com" });
     await mongoose.connection.close();
   });
@@ -37,10 +36,10 @@ describe("Auth API Endpoints", () => {
       .send({
         name: "Test Short Auth",
         email: "testunit-short@example.com",
-        password: "123" // Too short!
+        password: "123" 
       });
 
-    expect(res.statusCode).toBe(400); // Bad Request from Zod
+    expect(res.statusCode).toBe(400);
     expect(res.body.success).toBe(false);
   });
 
@@ -49,7 +48,7 @@ describe("Auth API Endpoints", () => {
       .post("/api/auth/register")
       .send({
         name: "Dupe Test",
-        email: "testunit@example.com", // Already registered
+        email: "testunit@example.com", 
         password: "securepassword"
       });
 

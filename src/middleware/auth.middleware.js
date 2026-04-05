@@ -15,19 +15,13 @@ export const protect = async (req, res, next) => {
     if (!token) {
       return next(new ApiError(401, "You are not logged in. Please log in to get access."));
     }
-
-    // Verify token
     const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET);
-
-    // Check if user session exists in Redis (if Redis used)
     if (redisClient) {
       const sessionData = await redisClient.get(`session:${decoded.id}`);
       if (!sessionData) {
         return next(new ApiError(401, "Session expired or invalid. Please log in again."));
       }
     }
-
-    // Attach user payload
     req.user = decoded;
     next();
   } catch (err) {

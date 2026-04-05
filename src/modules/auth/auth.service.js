@@ -38,7 +38,6 @@ export const registerUser = async (userData) => {
   const { accessToken, refreshToken } = generateTokens(user);
   
   if (redisClient) {
-    // Store refresh token in Redis for 7 days (matching REFRESH_TOKEN_EXPIRATION)
     await redisClient.set(`session:${user._id}`, refreshToken, "EX", 7 * 24 * 60 * 60);
   }
 

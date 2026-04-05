@@ -6,8 +6,6 @@ import { protect } from "../../middleware/auth.middleware.js";
 import { restrictTo } from "../../middleware/role.middleware.js";
 
 const router = express.Router();
-
-// All user routes below require authentication and Admin role
 router.use(protect);
 router.use(restrictTo("Admin"));
 

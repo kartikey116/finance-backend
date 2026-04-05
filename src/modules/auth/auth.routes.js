@@ -14,20 +14,7 @@ const router = express.Router();
  */
 
 /**
- * @swagger
- * /api/auth/register:
- *   post:
- *     summary: Register a new user
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [name, email, password]
- *             properties:
- *               name: { type: string }
+ * @swaggere: { type: string }
  *               email: { type: string, format: email }
  *               password: { type: string, minLength: 6 }
  *     responses:
@@ -42,6 +29,19 @@ router.post("/register", validate(authValidation.registerSchema), authController
  *   post:
  *     summary: Login and get tokens
  *     tags: [Auth]
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password]
+ *             properties:
+ *               nam
  *     requestBody:
  *       required: true
  *       content:

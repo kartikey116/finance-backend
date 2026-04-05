@@ -5,11 +5,10 @@ export const errorHandler = (err, req, res, next) => {
   let error = err;
 
   if (!(error instanceof ApiError)) {
-    // Handling Mongoose Validation Error
     if (error.name === "ValidationError") {
       const message = Object.values(error.errors).map((val) => val.message).join(", ");
       error = new ApiError(400, message);
-    } else if (error.code === 11000) { // Duplicate key error
+    } else if (error.code === 11000) { 
       error = new ApiError(400, "Duplicate field value entered");
     } else if (error.name === "CastError") {
       error = new ApiError(400, `Resource not found. Invalid: ${error.path}`);

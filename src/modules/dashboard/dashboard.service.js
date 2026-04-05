@@ -6,12 +6,9 @@ export const getDashboardSummary = async () => {
   const cachedData = await getCache(cacheKey);
 
   if (cachedData) {
-    // Injecting a simple property to indicate it was cached (optional, for debugging)
     cachedData._wasCached = true;
     return cachedData;
   }
-
-  // Aggregate total income and expenses
   const totalsInfo = await Finance.aggregate([
     {
       $group: {
@@ -30,8 +27,6 @@ export const getDashboardSummary = async () => {
   });
 
   const netBalance = totalIncome - totalExpense;
-
-  // Category-wise totals
   const categoryTotals = await Finance.aggregate([
     {
       $group: {
@@ -49,13 +44,11 @@ export const getDashboardSummary = async () => {
     },
   ]);
 
-  // Recent activity (last 5 records)
   const recentActivity = await Finance.find()
     .sort({ date: -1, createdAt: -1 })
     .limit(5)
     .select("-__v");
 
-  // Monthly Trends
   const monthlyTrends = await Finance.aggregate([
     {
       $group: {
@@ -81,7 +74,6 @@ export const getDashboardSummary = async () => {
     }
   ]);
 
-  // Weekly Trends
   const weeklyTrends = await Finance.aggregate([
     {
       $group: {
@@ -117,7 +109,6 @@ export const getDashboardSummary = async () => {
     weeklyTrends,
   };
 
-  // Cache for 1 hour
   await setCache(cacheKey, summary, 3600);
 
   return summary;

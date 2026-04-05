@@ -11,7 +11,6 @@ describe("Finance RBAC API Endpoints", () => {
   beforeAll(async () => {
     await mongoose.connect(env.MONGODB_URI);
 
-    // Create a Viewer User
     const viewerRes = await request(app).post("/api/auth/register").send({
       name: "Test Viewer",
       email: "viewer.test@example.com",
@@ -19,8 +18,6 @@ describe("Finance RBAC API Endpoints", () => {
       role: "Viewer"
     });
     viewerToken = viewerRes.body.data.token;
-
-    // Create an Admin User
     const adminRes = await request(app).post("/api/auth/register").send({
       name: "Test Admin",
       email: "admin.test@example.com",
@@ -31,7 +28,6 @@ describe("Finance RBAC API Endpoints", () => {
   });
 
   afterAll(async () => {
-    // Cleanup mock data
     await User.deleteMany({ email: { $in: ["viewer.test@example.com", "admin.test@example.com"] } });
     await mongoose.connection.collection("finances").deleteMany({ category: "Test Category" });
     await mongoose.connection.close();

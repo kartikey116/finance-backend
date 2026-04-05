@@ -12,11 +12,15 @@ if (env.REDIS_URL) {
   // We'll throw an error advising proper ioredis compatible URL.
   // Wait, let's just log a warning and proceed without Redis if not fully available
   // or use the url if it happens to be valid for ioredis.
-  console.warn("⚠️ Provide REDIS_URL for ioredis (e.g. redis://default:pass@endpoint:port)");
+  if (env.NODE_ENV !== "test") {
+    console.warn("⚠️ Provide REDIS_URL for ioredis (e.g. redis://default:pass@endpoint:port)");
+  }
 }
 
 if (!redisClient) {
-  console.warn("⚠️ Redis client not initialized. Cache and rate limiting might fail or be bypassed.");
+  if (env.NODE_ENV !== "test") {
+    console.warn("⚠️ Redis client not initialized. Cache and rate limiting might fail or be bypassed.");
+  }
 } else {
   redisClient.on("connect", () => console.log("✅ Redis Connected"));
   redisClient.on("error", (err) => console.error("❌ Redis Error:", err));

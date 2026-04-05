@@ -5,6 +5,11 @@ const WINDOW_SIZE_IN_SECONDS = 60;
 const MAX_REQUESTS = 100;
 
 export const rateLimiter = async (req, res, next) => {
+  // Always bypass rate limiting during test executions to prevent test suite 429 errors
+  if (process.env.NODE_ENV === "test") {
+    return next();
+  }
+
   if (!redisClient) {
     // If Redis is not available, just bypass rate limiting
     return next();

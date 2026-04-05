@@ -105,9 +105,6 @@ The **Finance Backend** was designed with a "Security-First, Scale-Always" philo
 *   **Rationale**: Financial apps cannot tolerate "junk data." Zod ensures that amounts are always positive numbers and categories match our strict enums before any business logic is executed. A centralized error middleware handles these failures with standardized JSON responses.
 
 ---
-
-=======
->>>>>>> 1aa2d41e169e192f76832da16a61183c3aeb6994
 ## API Documentation & Route Examples
 
 ### 1. Authentication (`/api/auth`)

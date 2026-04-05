@@ -10,6 +10,16 @@
 
 ---
 
+## 🌐 Live Deployment
+
+| Service | URL |
+| :--- | :--- |
+| **API Documentation** | [https://finance-backend-3o7n.onrender.com/api-docs/](https://finance-backend-3o7n.onrender.com/api-docs/#/) |
+| **Backend Base URL** | [https://finance-backend-3o7n.onrender.com](https://finance-backend-3o7n.onrender.com) |
+| **System Health** | [https://finance-backend-3o7n.onrender.com/api/health](https://finance-backend-3o7n.onrender.com/api/health) |
+
+---
+
 ## 💎 The Engineering Vision
 
 Modern financial platforms demand more than just "CRUD." They require absolute data integrity, ironclad role-based security, and lightning-fast analytics. The **Finance Backend** was architected to solve three core engineering challenges:
@@ -44,22 +54,6 @@ Use these pre-configured accounts to explore the system's Role-Based Access Cont
 - **Multi-Factor Filtering**: Slice and dice data by category, type (Income/Expense), date ranges, or global search.
 - **Offset Pagination**: Optimized list views that never load more data than the network can handle.
 
-### 📈 Smart Dashboard Analytics
-- **Live Summaries**: Real-time balance calculations, trend analysis, and category breakdowns.
-- **Performance Caching**: Computationally heavy analytics are cached globally in Redis, delivering millisecond response times even during high-traffic surges.
-
----
-
-## 🛠️ The "Pro" Tech Stack
-
-| Layer | Technology | Rationale |
-| :--- | :--- | :--- |
-| **Framework** | **Express.js (v5)** | Lightweight, non-opinionated, and highly extensible for mission-critical APIs. |
-| **Database** | **MongoDB (Mongoose)** | High-concurrency performance with flexible schema modeling for evolving financial data. |
-| **Cache** | **Upstash Redis** | Global, serverless caching for session management and dashboard acceleration. |
-| **Validation** | **Zod** | Type-safe, runtime schema validation that kills "junk data" before it touches the DB. |
-| **Documentation** | **Swagger / OpenAPI** | Beautiful, interactive API documentation for developer-friendly onboarding. |
-
 ---
 
 ## 🏗️ Permission Matrix (RBAC)
@@ -80,77 +74,95 @@ Use these pre-configured accounts to explore the system's Role-Based Access Cont
 
 ### 1. Authentication (`/api/auth`)
 
-#### `POST /api/auth/register`
-**Description**: Register a new user account.
-```json
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "securePassword123"
-}
-```
+- **POST `/api/auth/register`**
+  - **Description**: Register a new user account.
+  - **Example**: `{"name": "John Doe", "email": "john@example.com", "password": "securePassword123"}`
 
-#### `POST /api/auth/login`
-**Description**: Authenticate and receive an Access Token.
-```json
-{
-  "email": "admin@example.com",
-  "password": "admin@1234"
-}
-```
+- **POST `/api/auth/login`**
+  - **Description**: Authenticate and receive Access/Refresh tokens.
+  - **Example**: `{"email": "admin@example.com", "password": "admin@1234"}`
 
-#### `POST /api/auth/refresh-token`
-**Description**: Use the Refresh Token (sent in HttpOnly cookie) to get a new Access Token.
+- **POST `/api/auth/refresh-token`**
+  - **Description**: Refresh the access token using the HttpOnly cookie.
+
+- **POST `/api/auth/logout`**
+  - **Description**: Revoke session and clear cookies.
 
 ---
 
-### 2. Financial Records (`/api/finance`)
+### 2. Dashboard (`/api/dashboard`)
 
-#### `POST /api/finance` (Admin Only)
-**Description**: Create a new financial transaction.
-```json
-{
-  "description": "Office Supplies",
-  "amount": 1500,
-  "type": "expense",
-  "category": "Maintenance",
-  "date": "2024-04-06"
-}
-```
-
-#### `GET /api/finance` (Authenticated)
-**Description**: List records with filtering. Analytics/Admins see all; Viewers see only their own.
-- **Filters**: `type`, `category`, `startDate`, `endDate`, `search`, `page`, `limit`.
+- **GET `/api/dashboard/summary`**
+  - **Description**: High-level financial report (Total Income, Expenses, Balance, Category Breakdown).
+  - **Access**: Viewer, Analyst, Admin (Scoped by role).
 
 ---
 
-### 3. Dashboard (`/api/dashboard`)
+### 3. Financial Records (`/api/finance`)
 
-#### `GET /api/dashboard/summary` (Authenticated)
-**Description**: Retrieve the high-level financial health report. Includes Total Income, Expenses, Balance, and Category breakdowns.
+- **POST `/api/finance`**
+  - **Description**: Create a new income or expense.
+  - **Access**: Analyst, Admin.
+  - **Example**: `{"description": "Freelance Payment", "amount": 2500, "type": "income", "category": "Salary", "date": "2024-04-06"}`
+
+- **GET `/api/finance`**
+  - **Description**: List paginated records with filters (type, category, search).
+  - **Access**: Authenticated (Scoped).
+
+- **GET `/api/finance/{id}`**
+  - **Description**: Retrieve specific transaction details.
+  - **Access**: Owner or Admin.
+
+- **PUT `/api/finance/{id}`**
+  - **Description**: Update an existing record.
+  - **Access**: Admin.
+  - **Example**: `{"description": "Revised Amount", "amount": 2600}`
+
+- **DELETE `/api/finance/{id}`**
+  - **Description**: Soft-delete a record (audit-safe).
+  - **Access**: Admin.
 
 ---
 
-### 4. User Management (`/api/users`) - (Admin Only)
+### 4. User Management (`/api/users`)
 
-#### `POST /api/users`
-**Description**: Create a specific user with a set role.
-```json
-{
-  "name": "Jane Analyst",
-  "email": "jane@example.com",
-  "password": "analystPass123",
-  "role": "Analyst"
-}
-```
+- **GET `/api/users`**
+  - **Description**: Full user directory audit.
+  - **Access**: Admin.
 
-#### `PUT /api/users/:id/status`
-**Description**: Deactivate or activate a user account.
-```json
-{
-  "status": "Inactive"
-}
-```
+- **POST `/api/users`**
+  - **Description**: Manually seed/create a user with a specific role.
+  - **Access**: Admin.
+  - **Example**: `{"name": "Alice", "email": "alice@hr.com", "password": "password123", "role": "Analyst"}`
+
+- **PUT `/api/users/{id}/status`**
+  - **Description**: Instantly ban/unban a user (Active/Inactive).
+  - **Access**: Admin.
+  - **Example**: `{"status": "Inactive"}`
+
+- **PUT `/api/users/{id}/role`**
+  - **Description**: Promote or demote a user's permissions.
+  - **Access**: Admin.
+  - **Example**: `{"role": "Admin"}`
+
+---
+
+### 5. System Health (`/api/health`)
+
+- **GET `/api/health`**
+  - **Description**: Real-time status of Database, Redis, and Uptime.
+
+---
+
+## 🛣️ Future-Proofing / Roadmap
+
+This project is built to scale beyond a simple dashboard. Our next phase focused on enterprise readiness:
+
+- **[ ] Multi-Factor Authentication (MFA)**: Integration with TOTP/SMS for account security.
+- **[ ] AI-Powered Spending Insights**: Using ML models to predict future cashflow trends and detect anomalies in categories.
+- **[ ] Event-Driven Webhooks**: Notifying external systems (Slack/Email) whenever a high-amount transaction is recorded.
+- **[ ] Professional Reporting (PDF/CSV)**: Automated generation of monthly financial ledgers for tax and audit purposes.
+- **[ ] Microservices Ready**: Containerization with Docker and Kubernetes for high-availability horizontal scaling.
 
 ---
 
@@ -163,10 +175,10 @@ npm run dev
 ```
 
 ### 2. Launch
-The server starts at `http://localhost:5000`. You can access the interactive **Swagger UI** at `http://localhost:5000/api-docs`.
+The server starts at `http://localhost:5000`. Access the interactive **Swagger UI** for live testing at `http://localhost:5000/api-docs`.
 
 ---
 
-## 👨‍💻 Author & Reviewer Info
+## 👨‍💻 Engineering Leadership
 
-This project demonstrates a production-grade approach to **Backend Security**, **Database Optimization**, and **Clean Code Principles**. It is ready for deployment and high-level architectural review.
+This project serves as a showcase of **Clean Architecture**, **Layered Security**, and **Real-World Optimization**. It is ready for deployment and architectural scrutiny.

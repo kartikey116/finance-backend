@@ -1,27 +1,54 @@
 import * as authService from "./auth.service.js";
-import { sendResponse, asyncHandler } from "../../utils/apiResponse.js";
+import { sendResponse, asyncHandler, ApiError } from "../../utils/apiResponse.js";
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
 
 export const register = asyncHandler(async (req, res) => {
   const result = await authService.registerUser(req.body);
-  sendResponse(res, 201, "User registered successfully", result);
+  
+  res.cookie("refresh_token", result.refreshToken, cookieOptions);
+  
+  sendResponse(res, 201, "User registered successfully", {
+    user: result.user,
+    accessToken: result.accessToken
+  });
 });
 
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const result = await authService.loginUser(email, password);
   
-  // Set cookie for session (optional but secure method)
-  res.cookie("session_token", result.token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
-  });
+  res.cookie("refresh_token", result.refreshToken, cookieOptions);
 
-  sendResponse(res, 200, "User logged in successfully", result);
+  sendResponse(res, 200, "User logged in successfully", {
+    user: result.user,
+    accessToken: result.accessToken
+  });
+});
+
+export const refresh = asyncHandler(async (req, res) => {
+  const oldRefreshToken = req.cookies.refresh_token;
+  
+  if (!oldRefreshToken) {
+    throw new ApiError(401, "Refresh token not found");
+  }
+
+  const result = await authService.refreshAccessToken(oldRefreshToken);
+  
+  res.cookie("refresh_token", result.refreshToken, cookieOptions);
+
+  sendResponse(res, 200, "Token refreshed successfully", {
+    accessToken: result.accessToken
+  });
 });
 
 export const logout = asyncHandler(async (req, res) => {
   await authService.logoutUser(req.user.id);
-  res.clearCookie("session_token");
+  res.clearCookie("refresh_token");
   sendResponse(res, 200, "User logged out successfully");
 });

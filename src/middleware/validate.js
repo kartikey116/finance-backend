@@ -9,7 +9,10 @@ export const validate = (schema) => (req, res, next) => {
     });
     next();
   } catch (err) {
-    const message = err.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
+    let message = err.message;
+    if (err.errors && Array.isArray(err.errors)) {
+      message = err.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
+    }
     next(new ApiError(400, message));
   }
 };

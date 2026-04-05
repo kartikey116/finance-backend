@@ -66,3 +66,22 @@ src/
 │
 ├── app.js                  # Express app
 └── server.js               # Entry point
+
+
+{
+  "name": "viewer",
+  "email": "viewer@example.com",
+  "password": "viewer@1234",
+  "role": "Viewer"
+}
+{
+  "email": "admin@example.com",
+  "password": "admin@1234"
+}
+{
+  "name": "analytics",
+  "email": "analytics@example.com",
+  "password": "analytics@1234",
+  "role": "Analyst"
+}
+

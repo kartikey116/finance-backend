@@ -17,18 +17,13 @@ export const protect = async (req, res, next) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, env.JWT_SECRET);
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET);
 
     // Check if user session exists in Redis (if Redis used)
     if (redisClient) {
       const sessionData = await redisClient.get(`session:${decoded.id}`);
       if (!sessionData) {
-         return next(new ApiError(401, "Session expired or invalid. Please log in again."));
-      }
-
-      // We can also verify token matches
-      if (sessionData !== token) {
-         return next(new ApiError(401, "Invalid session token."));
+        return next(new ApiError(401, "Session expired or invalid. Please log in again."));
       }
     }
 

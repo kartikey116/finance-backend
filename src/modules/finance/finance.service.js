@@ -12,20 +12,26 @@ export const createRecord = async (recordData, userId) => {
   return record;
 };
 
-export const listRecords = async (query) => {
+export const listRecords = async (query, user) => {
   const { type, category, search, startDate, endDate, page = "1", limit = "10" } = query;
   const pageNum = parseInt(page);
   const limitNum = parseInt(limit);
 
   const filter = {};
-  if (type) filter.type = type;
+  
+  // Role-based filtering: Viewers only see their own records
+  if (user.role === "Viewer") {
+    filter.createdBy = user.id;
+  }
+
+  if (type) filter.type = type.toLowerCase();
   if (category) filter.category = category;
   
   if (search) {
-    // Basic text search using regex across notes and category
     filter.$or = [
-      { notes: { $regex: search, $options: "i" } },
-      { category: { $regex: search, $options: "i" } }
+      { description: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
+      { notes: { $regex: search, $options: "i" } }
     ];
   }
   
@@ -56,39 +62,56 @@ export const listRecords = async (query) => {
   };
 };
 
-export const getRecordById = async (id) => {
+export const getRecordById = async (id, user) => {
   const record = await Finance.findById(id).populate("createdBy", "name email");
+  
   if (!record) {
     throw new ApiError(404, "Financial record not found");
   }
+
+  // Ownership check for Viewers
+  if (user.role === "Viewer" && record.createdBy._id.toString() !== user.id) {
+    throw new ApiError(403, "You do not have permission to view this record");
+  }
+
   return record;
 };
 
-export const updateRecord = async (id, updateData) => {
-  const record = await Finance.findByIdAndUpdate(id, updateData, {
+export const updateRecord = async (id, updateData, user) => {
+  const record = await Finance.findById(id);
+
+  if (!record) {
+    throw new ApiError(404, "Financial record not found");
+  }
+
+  // Extra safety: only Admins can reach this from routes, but good for service integrity
+  if (user.role !== "Admin") {
+     throw new ApiError(403, "Only Admins can update records");
+  }
+
+  const updatedRecord = await Finance.findByIdAndUpdate(id, updateData, {
     new: true,
     runValidators: true,
   });
 
+  await invalidateDashboardCache();
+  return updatedRecord;
+};
+
+export const deleteRecord = async (id, user) => {
+  const record = await Finance.findById(id);
+
   if (!record) {
     throw new ApiError(404, "Financial record not found");
   }
-  
-  await invalidateDashboardCache();
-  return record;
-};
 
-export const deleteRecord = async (id) => {
-  // Use findByIdAndUpdate to toggle isDeleted flag (Soft Delete)
-  const record = await Finance.findByIdAndUpdate(
-    id, 
-    { isDeleted: true },
-    { new: true }
-  );
-
-  if (!record) {
-    throw new ApiError(404, "Financial record not found or already deleted");
+  if (user.role !== "Admin") {
+    throw new ApiError(403, "Only Admins can delete records");
   }
+
+  record.isDeleted = true;
+  await record.save();
+
   await invalidateDashboardCache();
   return record;
 };

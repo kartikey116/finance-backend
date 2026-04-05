@@ -7,21 +7,21 @@ export const createRecord = asyncHandler(async (req, res) => {
 });
 
 export const listRecords = asyncHandler(async (req, res) => {
-  const data = await financeService.listRecords(req.query);
+  const data = await financeService.listRecords(req.query, req.user);
   sendResponse(res, 200, "Records retrieved successfully", data);
 });
 
 export const getRecordById = asyncHandler(async (req, res) => {
-  const record = await financeService.getRecordById(req.params.id);
+  const record = await financeService.getRecordById(req.params.id, req.user);
   sendResponse(res, 200, "Record retrieved successfully", record);
 });
 
 export const updateRecord = asyncHandler(async (req, res) => {
-  const record = await financeService.updateRecord(req.params.id, req.body);
+  const record = await financeService.updateRecord(req.params.id, req.body, req.user);
   sendResponse(res, 200, "Record updated successfully", record);
 });
 
 export const deleteRecord = asyncHandler(async (req, res) => {
-  await financeService.deleteRecord(req.params.id);
+  await financeService.deleteRecord(req.params.id, req.user);
   sendResponse(res, 200, "Record deleted successfully");
 });

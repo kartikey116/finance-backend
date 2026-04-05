@@ -2,20 +2,22 @@ import { z } from "zod";
 
 export const createFinanceSchema = z.object({
   body: z.object({
+    description: z.string().min(3, "Please provide a more detailed description"),
     amount: z.number().positive("Amount must be positive"),
-    type: z.enum(["income", "expense"]),
+    type: z.preprocess((val) => val?.toLowerCase(), z.enum(["income", "expense"])),
     category: z.string().min(2, "Category is required"),
-    date: z.string().datetime().optional(), // Using ISO string for dates from client
+    date: z.coerce.date().optional(),
     notes: z.string().optional(),
   }),
 });
 
 export const updateFinanceSchema = z.object({
   body: z.object({
+    description: z.string().min(3).optional(),
     amount: z.number().positive().optional(),
-    type: z.enum(["income", "expense"]).optional(),
+    type: z.preprocess((val) => val?.toLowerCase(), z.enum(["income", "expense"]).optional()),
     category: z.string().min(2).optional(),
-    date: z.string().datetime().optional(),
+    date: z.coerce.date().optional(),
     notes: z.string().optional(),
   }),
   params: z.object({

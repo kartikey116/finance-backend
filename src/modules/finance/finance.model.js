@@ -2,12 +2,18 @@ import mongoose from "mongoose";
 
 const financeSchema = new mongoose.Schema(
   {
+    description: {
+      type: String,
+      required: [true, "Please provide a description"],
+      trim: true,
+    },
     amount: {
       type: Number,
       required: [true, "Please provide the amount"],
     },
     type: {
       type: String,
+      lowercase: true,
       enum: ["income", "expense"],
       required: [true, "Record must be categorized as income or expense"],
     },
@@ -37,19 +43,10 @@ const financeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Middleware to skip deleted records in queries gracefully
-financeSchema.pre(/^find/, function (next) {
+financeSchema.pre(/^find/, function () {
   this.where({ isDeleted: { $ne: true } });
-  next();
 });
 
-// Middleware for aggregation to skip deleted records
-financeSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-  next();
-});
-
-// Index for filtering & dashboard queries performance
 financeSchema.index({ type: 1, category: 1, date: -1 });
 
 export default mongoose.model("Finance", financeSchema);

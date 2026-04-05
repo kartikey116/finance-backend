@@ -3,41 +3,43 @@ import redisClient from "../../config/redis.js";
 import { sendResponse, asyncHandler } from "../../utils/apiResponse.js";
 
 export const getHealth = asyncHandler(async (req, res) => {
-    const healthStatus = {
-        status: "UP",
-        timestamp: new Date().toISOString(),
-        services: {
-            api: "UP",
-            database: "DOWN",
-            cache: "DOWN",
-        },
-        uptime: process.uptime(),
-    };
-
     try {
-        if (mongoose.connection.readyState === 1) {
-            healthStatus.services.database = "UP";
+        const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+        let dbPing = null;
+        
+        if (dbStatus === 'connected') {
+            const admin = mongoose.connection.db.admin();
+            dbPing = await admin.ping();
         }
-    } catch (error) {
-        healthStatus.services.database = "DOWN";
-    }
 
-    try {
+        let redisStatus = 'disconnected';
         if (redisClient) {
-            await redisClient.ping();
-            healthStatus.services.cache = "UP";
-        } else {
-            healthStatus.services.cache = "NOT_CONFIGURED";
+            try {
+                const reply = await redisClient.ping();
+                redisStatus = reply;
+            } catch (err) {
+                console.error('Redis connection error:', err);
+                redisStatus = 'error';
+            }
         }
+
+        const isHealthy = dbStatus === 'connected' && redisStatus === 'PONG';
+        const statusCode = isHealthy ? 200 : 500;
+
+        res.status(statusCode).json({
+            status: isHealthy ? 'ok' : 'error',
+            database: {
+                status: dbStatus,
+                dbPing: dbPing
+            },
+            redis: {
+                status: redisStatus
+            },
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime()
+        });
     } catch (error) {
-        healthStatus.services.cache = "DOWN";
+        console.error('Health Check Error:', error);
+        res.status(500).json({ status: 'error', message: 'Health check failed' });
     }
-
-    const serviceValues = Object.values(healthStatus.services);
-    const allUp = serviceValues.every((s) => s === "UP" || s === "NOT_CONFIGURED");
-    const hasFailure = serviceValues.some((s) => s === "DOWN");
-    healthStatus.status = hasFailure ? "DEGRADED" : "UP";
-    const statusCode = healthStatus.status === "UP" ? 200 : 503;
-
-    sendResponse(res, statusCode, "Health status retrieved", healthStatus);
 });

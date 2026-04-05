@@ -1,15 +1,27 @@
+import mongoose from "mongoose";
 import Finance from "../finance/finance.model.js";
 import { getCache, setCache } from "../../cache/cache.service.js";
 
-export const getDashboardSummary = async () => {
-  const cacheKey = "dashboard:summary:general";
+export const getDashboardSummary = async (user) => {
+  const isViewer = user && user.role === "Viewer";
+  const cacheKey = isViewer ? `dashboard:summary:user:${user.id}` : "dashboard:summary:general";
   const cachedData = await getCache(cacheKey);
 
   if (cachedData) {
     cachedData._wasCached = true;
     return cachedData;
   }
+
+  const matchFilter = { isDeleted: false };
+
+  if (isViewer) {
+    matchFilter.createdBy = new mongoose.Types.ObjectId(user.id);
+  }
+
+  const matchStage = { $match: matchFilter };
+
   const totalsInfo = await Finance.aggregate([
+    matchStage,
     {
       $group: {
         _id: "$type",
@@ -28,6 +40,7 @@ export const getDashboardSummary = async () => {
 
   const netBalance = totalIncome - totalExpense;
   const categoryTotals = await Finance.aggregate([
+    matchStage,
     {
       $group: {
         _id: { type: "$type", category: "$category" },
@@ -44,12 +57,14 @@ export const getDashboardSummary = async () => {
     },
   ]);
 
-  const recentActivity = await Finance.find()
+  const recentFilter = isViewer ? { createdBy: user.id } : {};
+  const recentActivity = await Finance.find(recentFilter)
     .sort({ date: -1, createdAt: -1 })
     .limit(5)
     .select("-__v");
 
   const monthlyTrends = await Finance.aggregate([
+    matchStage,
     {
       $group: {
         _id: {
@@ -75,6 +90,7 @@ export const getDashboardSummary = async () => {
   ]);
 
   const weeklyTrends = await Finance.aggregate([
+    matchStage,
     {
       $group: {
         _id: {

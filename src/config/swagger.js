@@ -11,6 +11,10 @@ const swaggerOptions = {
     },
     servers: [
       {
+        url: "https://finance-backend-3o7n.onrender.com/",
+        description: "Production Server",
+      },
+      {
         url: "http://localhost:5000",
       },
     ],

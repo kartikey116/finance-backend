@@ -70,7 +70,6 @@ Use these pre-configured accounts to explore the system's Role-Based Access Cont
 
 ---
 
-<<<<<<< HEAD
 ## Strategic Technical Decisions & Architectural Rationale
 
 The **Finance Backend** was designed with a "Security-First, Scale-Always" philosophy. Every technical decision was evaluated against three main criteria: **Data Integrity**, **System Resilience**, and **Developer Experience**.
